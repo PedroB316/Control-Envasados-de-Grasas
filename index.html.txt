@@ -1,0 +1,153 @@
+<index.html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabReport - Control de Procesos</title>
+    <!-- Tailwind CSS para diseño Mobile-First rápido y limpio -->
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        /* Optimizaciones táctiles para pantallas de teléfonos */
+        input, select, textarea { font-size: 16px !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen pb-12">
+
+    <!-- LOGIN / CONTROL DE ACCESO -->
+    <div id="login-screen" class="fixed inset-0 bg-gray-950 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl">
+            <div class="text-center mb-6">
+                <span class="text-xs font-bold tracking-widest text-emerald-400 uppercase">Sistema de Laboratorio</span>
+                <h1 class="text-xl font-black mt-1">Control de Envasados</h1>
+            </div>
+            <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Seleccione su Usuario</label>
+            <select id="user-select" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white mb-4 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="Admin">Administrador (Tú)</option>
+                <option value="Analista 1">Analista de Laboratorio 1</option>
+                <option value="Analista 2">Analista de Laboratorio 2</option>
+                <option value="Analista 3">Analista de Laboratorio 3</option>
+                <option value="Analista 4">Analista de Laboratorio 4</option>
+            </select>
+            <button onclick="login()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-emerald-900/30">
+                Ingresar al Sistema
+            </button>
+        </div>
+    </div>
+
+    <!-- NAVBAR PRINCIPAL -->
+    <header class="bg-gray-950 border-b border-gray-800 sticky top-0 z-40 px-4 py-3 flex justify-between items-center">
+        <div>
+            <h2 class="text-xs font-bold text-gray-400 uppercase">Control de Procesos de Envasados de Grasas</h2>
+            <div class="flex items-center gap-2">
+                <span id="nav-user" class="text-sm font-semibold text-emerald-400">Usuario</span>
+                <span id="badge-role" class="text-[10px] bg-emerald-900/50 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full font-bold uppercase">Rol</span>
+            </div>
+        </div>
+        <button onclick="logout()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700">
+            Salir
+        </button>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-xl mx-auto p-4 space-y-6">
+
+        <!-- BOTÓN PANEL DE ADMINISTRADOR (SOLO VISIBLE PARA ROL ADMIN) -->
+        <div id="admin-trigger-zone" class="hidden">
+            <button onclick="toggleAdminPanel()" class="w-full bg-purple-900/40 hover:bg-purple-900/60 border border-purple-800 text-purple-300 py-3 rounded-xl font-bold transition-all flex justify-between items-center px-4">
+                <span>📊 Ver Base de Datos y Trazabilidad</span>
+                <span id="admin-toggle-icon">▼</span>
+            </button>
+        </div>
+
+        <!-- PANEL DE TRAZABILIDAD (ADMIN) -->
+        <section id="admin-panel" class="hidden bg-gray-950 border border-purple-900/50 rounded-2xl p-4 shadow-inner space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                <h3 class="text-sm font-bold text-purple-400 uppercase">Logs de Auditoría Inmutables</h3>
+                <button onclick="clearLogs()" class="text-[10px] bg-red-950 hover:bg-red-900 text-red-400 px-2 py-1 rounded border border-red-800 font-bold">Limpiar Data</button>
+            </div>
+            <div id="logs-container" class="max-h-60 overflow-y-auto space-y-2 text-xs no-scrollbar">
+                <!-- Logs inyectados por JS -->
+                <p class="text-gray-500 italic">No hay registros almacenados en este dispositivo.</p>
+            </div>
+        </section>
+
+        <!-- FORMULARIO DE REPORTE -->
+        <form id="report-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+            
+            <!-- SECCIÓN 1: DATOS OPERATIVOS GENERALES -->
+            <div class="bg-gray-950 border border-gray-800 rounded-2xl p-4 space-y-3">
+                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">1. Datos Operativos</h3>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-400 mb-1">Fecha de Turno</label>
+                        <input type="date" id="form-date" required class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-400 mb-1">Turno</label>
+                        <select id="form-shift" required class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white focus:ring-1 focus:ring-emerald-500">
+                            <option value="6am-2pm">6:00 AM - 2:00 PM</option>
+                            <option value="2pm-10pm">2:00 PM - 10:00 PM</option>
+                            <option value="10pm-6am">10:00 PM - 6:00 AM</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-400 mb-1">Línea de Envasado</label>
+                        <select id="form-line" required class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white focus:ring-1 focus:ring-emerald-500">
+                            <option value="Linea C">Línea C</option>
+                            <option value="Linea B">Línea B</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-400 mb-1">Analista Firmante</label>
+                        <input type="text" id="form-analyst-name" required placeholder="Nombre y Apellido" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-400 mb-1">Selección de SKU (Producto)</label>
+                    <select id="form-sku" onchange="evaluateSkuWorkflow()" required class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-3 text-white font-semibold text-sm focus:ring-1 focus:ring-emerald-500">
+                        <option value="Margarina Mirasol Untable 24x227gr">Margarina Mirasol Untable 24x227gr</option>
+                        <option value="Margarina Mirasol Untable 12x454gr">Margarina Mirasol Untable 12x454gr</option>
+                        <option value="Manteca Coposa 12x400gr">Manteca Coposa 12x400gr</option>
+                        <option value="Manteca Coposa 1x5kg">Manteca Coposa 1x5kg</option>
+                        <option value="Manteca Coposa 1x15kg">Manteca Coposa 1x15kg</option>
+                        <option value="Panelon C/S 1x5kg">Panelon C/S 1x5kg</option>
+                        <option value="Panelon S/S 1x5kg">Panelon S/S 1x5kg</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-400 mb-1">Fecha de Producción</label>
+                        <input type="date" id="prod-date" required class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-400 mb-1">Lote de Producción</label>
+                        <input type="text" id="prod-batch" required placeholder="Ej: L20261108" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-white placeholder-gray-600 focus:ring-1 focus:ring-emerald-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- WORKFLOW EXCLUSIVO PARA MARGARINAS -->
+            <div id="margarina-workflow" class="space-y-4">
+                
+                <!-- SECCIÓN 2: TANQUES ACUOSOS (REPETIBLE) -->
+                <div class="bg-gray-950 border border-gray-800 rounded-2xl p-4 space-y-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider">2. Monitoreo de Tanques Acuosos</h3>
+                        <button type="button" onclick="addAcuosoRow()" class="text-xs bg-sky-900/60 hover:bg-sky-800 text-sky-300 border border-sky-700 px-3 py-1 rounded-xl font-bold transition-all">
+                            + Añadir Muestra
+                        </button>
+                    </div>
+                    <div id="acuoso-container" class="space-y-2">
+                        <!-- Filas dinámicas inyectadas -->
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: TANQUE ALIMENTADOR DEL PROCESO -->
+                <div class="bg-gray-950 border border-gray-800 rounded-2xl p-4 space-y-3">
